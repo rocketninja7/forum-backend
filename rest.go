@@ -52,3 +52,19 @@ func PostNewPost(c *gin.Context) {
 	}
 	c.IndentedJSON(http.StatusCreated, post)
 }
+
+// TODO: Remove repetition
+func PostNewComment(c *gin.Context) {
+	var comment Comment
+	if err := c.BindJSON(&comment); err != nil {
+		fmt.Println(err)
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Invalid JSON for comment"})
+		return
+	}
+	_, err := AddComment(&comment)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	c.IndentedJSON(http.StatusCreated, comment)
+}

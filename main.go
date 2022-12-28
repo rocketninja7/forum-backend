@@ -28,7 +28,7 @@ type Post struct {
 type Comment struct {
 	Id int64 `json:"id"`
 	TimeCreated time.Time `json:"time_created"`
-	Post int64 `json:"post"`
+	PostId int64 `json:"post"`
 	Commenter User `json:"commenter"`
 	Content string `json:"content"`
 }
@@ -62,9 +62,10 @@ func main() {
 	router.GET("/", GetAllPostsRest)
 	router.GET("/post/:id/", GetPostByIDRest)
 	// router.POST("/login/")
-	// router.POST("/user/:id/")
-	// router.POST("/tag/:id/")
+	// router.GET("/user/:id/")
+	// router.GET("/tag/:id/")
 	router.POST("/newpost/", PostNewPost)
+	router.POST("/newcomment/", PostNewComment)
 
 	router.Run("localhost:8080")
 }

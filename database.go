@@ -67,7 +67,7 @@ func GetCommentsByPostID(id int64) ([]Comment, error) {
 	for rows.Next() {
 		var comment Comment
 		var user User
-		if err := rows.Scan(&comment.Id, &comment.TimeCreated, &comment.Post, &user.Id, &comment.Content, &user.Username); err != nil {
+		if err := rows.Scan(&comment.Id, &comment.TimeCreated, &comment.PostId, &user.Id, &comment.Content, &user.Username); err != nil {
 			return nil, err
 		}
 		comment.Commenter = user
@@ -88,4 +88,13 @@ func AddPost(post *Post) (int64, error) {
 		return 0, err
 	}
 	return post.Id, nil
+}
+
+func AddComment(comment *Comment) (int64, error) {
+	err := db.QueryRow(
+		"INSERT INTO comment (post, commenter, time_created, \"content\") VALUES ($1, $2, $3, $4) RETURNING \"id\"", comment.PostId, comment.Commenter.Id, time.Now(), comment.Content).Scan(&comment.Id)
+	if err != nil {
+		return 0, err
+	}
+	return comment.Id, nil
 }
