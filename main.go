@@ -23,6 +23,7 @@ type Post struct {
 	Title string `json:"title"`
 	Content string `json:"content"`
 	Comments []Comment `json:"comments"`
+	Tags []Tag `json:"tags"`
 }
 
 type Comment struct {
@@ -31,6 +32,11 @@ type Comment struct {
 	PostId int64 `json:"post"`
 	Commenter User `json:"commenter"`
 	Content string `json:"content"`
+}
+
+type Tag struct {
+	Id int64 `json:"id"`
+	Name string `json:"name"`
 }
 
 var db *sql.DB
@@ -64,8 +70,8 @@ func main() {
 	// router.POST("/login/")
 	// router.GET("/user/:id/")
 	// router.GET("/tag/:id/")
-	router.POST("/newpost/", PostNewPost)
-	router.POST("/newcomment/", PostNewComment)
+	router.POST("/newpost/", PostNewPostRest)
+	router.POST("/newcomment/", PostNewCommentRest)
 
 	router.Run("localhost:8080")
 }

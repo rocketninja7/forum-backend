@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func GetAllPostsWithoutComments() ([]Post, error) {
+func GetAllPostsWithUser() ([]Post, error) {
 	var posts []Post
 
 	rows, err := db.Query(
@@ -25,6 +25,40 @@ func GetAllPostsWithoutComments() ([]Post, error) {
 		}
 		post.Poster = user
 		posts = append(posts, post)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return posts, nil
+}
+
+func GetAllTagsForPosts(posts []Post) ([]Post, error) {
+	postsById := make(map[int64]*Post)
+	for idx := range posts {
+		posts[idx].Tags = make([]Tag, 0)
+		postsById[posts[idx].Id] = &posts[idx]
+	}
+
+	rows, err := db.Query(
+		"SELECT post_tag.post_id, post_tag.tag_id, tag.\"name\" " + 
+		"FROM post_tag JOIN tag ON post_tag.tag_id=tag.\"id\" ORDER BY post_id")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var postId int64
+		var tag Tag
+		if err := rows.Scan(&postId, &tag.Id, &tag.Name); err != nil {
+			return nil, err
+		}
+		currPost, ok := postsById[postId]
+		if ok {
+			currPost.Tags = append(currPost.Tags, tag)
+		}
 	}
 
 	if err := rows.Err(); err != nil {
@@ -81,6 +115,33 @@ func GetCommentsByPostID(id int64) ([]Comment, error) {
 	return comments, nil
 }
 
+func GetTagsByPostID(id int64) ([]Tag, error) {
+	tags := make([]Tag, 0)
+
+	rows, err := db.Query(
+		"SELECT tag.\"id\", tag.\"name\" " + 
+		"FROM post_tag JOIN tag ON post_tag.tag_id=tag.\"id\" " + 
+		"WHERE post_tag.post_id=$1", id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var tag Tag
+		if err := rows.Scan(&tag.Id, &tag.Name); err != nil {
+			return nil, err
+		}
+		tags = append(tags, tag)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return tags, nil
+}
+
 func AddPost(post *Post) (int64, error) {
 	err := db.QueryRow(
 		"INSERT INTO post (poster, time_created, title, \"content\") VALUES ($1, $2, $3, $4) RETURNING \"id\"", post.Poster.Id, time.Now(), post.Title, post.Content).Scan(&post.Id)
@@ -97,4 +158,34 @@ func AddComment(comment *Comment) (int64, error) {
 		return 0, err
 	}
 	return comment.Id, nil
+}
+
+// TODO: Remove repetition, currently not used
+func GetPostsByTagID(id int64) ([]Post, error) {
+	var posts []Post
+
+	rows, err := db.Query(
+		"SELECT post.\"id\", post.poster, post.time_created, post.title, post.\"content\", \"user\".username " + 
+		"FROM post_tag JOIN post ON post_tag.post_id=post.\"id\" JOIN \"user\" ON post.poster=\"user\".\"id\" " + 
+		"WHERE post_tag.tag_id=$1", id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var post Post
+		var user User
+		if err := rows.Scan(&post.Id, &user.Id, &post.TimeCreated, &post.Title, &post.Content, &user.Username); err != nil {
+			return nil, err
+		}
+		post.Poster = user
+		posts = append(posts, post)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return posts, nil
 }

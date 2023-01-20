@@ -9,7 +9,12 @@ import (
 )
 
 func GetAllPostsRest(c *gin.Context) {
-	posts, err := GetAllPostsWithoutComments()
+	posts, err := GetAllPostsWithUser()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	posts, err = GetAllTagsForPosts(posts)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -35,10 +40,16 @@ func GetPostByIDRest(c *gin.Context) {
 		return
 	}
 	post.Comments = comments
+	tags, err := GetTagsByPostID(id)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	post.Tags = tags
 	c.IndentedJSON(http.StatusOK, post)
 }
 
-func PostNewPost(c *gin.Context) {
+func PostNewPostRest(c *gin.Context) {
 	var post Post
 	if err := c.BindJSON(&post); err != nil {
 		fmt.Println(err)
@@ -54,7 +65,7 @@ func PostNewPost(c *gin.Context) {
 }
 
 // TODO: Remove repetition
-func PostNewComment(c *gin.Context) {
+func PostNewCommentRest(c *gin.Context) {
 	var comment Comment
 	if err := c.BindJSON(&comment); err != nil {
 		fmt.Println(err)
@@ -67,4 +78,15 @@ func PostNewComment(c *gin.Context) {
 		return
 	}
 	c.IndentedJSON(http.StatusCreated, comment)
+}
+
+func GetPostsByTagRest(c *gin.Context) {
+	/*
+	idStr := c.Param("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": fmt.Sprintf("Invalid ID %v: Not an integer", idStr)})
+		return
+	}
+	*/
 }
