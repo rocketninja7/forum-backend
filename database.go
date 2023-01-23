@@ -189,3 +189,22 @@ func GetPostsByTagID(id int64) ([]Post, error) {
 
 	return posts, nil
 }
+
+func AddUser(user *User) (int64, error) {
+	err := db.QueryRow(
+		"INSERT INTO \"user\" (username) VALUES ($1) RETURNING \"id\"", user.Username).Scan(&user.Id)
+	if err != nil {
+		return 0, err
+	}
+	return user.Id, nil
+}
+
+func GetUser(username string) (*User, error) {
+	var user User
+	err := db.QueryRow(
+		"SELECT \"id\", username FROM \"user\" WHERE username=$1", username).Scan(&user.Id, &user.Username)
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}

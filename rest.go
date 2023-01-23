@@ -90,3 +90,23 @@ func GetPostsByTagRest(c *gin.Context) {
 	}
 	*/
 }
+
+// TODO: Remove repetition
+func PostNewUserRest(c *gin.Context) {
+	var user User
+	if err := c.BindJSON(&user); err != nil {
+		fmt.Println(err)
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Invalid JSON for user"})
+		return
+	}
+	_, err := AddUser(&user)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	c.IndentedJSON(http.StatusCreated, user)
+}
+
+func PostLoginRest(c *gin.Context) {
+
+}

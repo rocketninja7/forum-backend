@@ -67,12 +67,22 @@ func main() {
 	
 	router.GET("/", GetAllPostsRest)
 	router.GET("/post/:id/", GetPostByIDRest)
-	// router.POST("/login/")
+	router.POST("/login/", PostLoginRest)
 	// router.GET("/user/:id/")
 	// router.GET("/tag/:id/")
 	router.POST("/newpost/", PostNewPostRest)
 	router.POST("/newcomment/", PostNewCommentRest)
+	// router.PUT("/post/:id/")
+	// router.DELETE("/post/:id/")
+	// router.PUT("/comment/:id/")
+	// router.DELETE("/comment/:id/")
+	router.POST("/newuser/", PostNewUserRest)
 
+	router.POST("/token/", GenerateToken)
+	secured := router.Group("/secured").Use(Auth)
+	{
+		secured.GET("/ping/", Ping)
+	}
 	router.Run("localhost:8080")
 }
 
