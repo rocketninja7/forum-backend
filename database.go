@@ -11,7 +11,7 @@ func GetAllPostsWithUser() ([]Post, error) {
 
 	rows, err := db.Query(
 		"SELECT post.\"id\", post.poster, post.time_created, post.title, post.\"content\", \"user\".username " + 
-		"FROM post JOIN \"user\" ON post.poster=\"user\".\"id\"")
+		"FROM post JOIN \"user\" ON post.poster=\"user\".\"id\" ORDER BY post.time_created")
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +87,7 @@ func GetPostByID(id int64) (Post, error) {
 }
 
 func GetCommentsByPostID(id int64) ([]Comment, error) {
-	var comments []Comment
+	comments := make([]Comment, 0)
 
 	rows, err := db.Query(
 		"SELECT \"comment\".\"id\", \"comment\".time_created, \"comment\".post, \"comment\".commenter, \"comment\".\"content\", \"user\".username " + 
@@ -158,6 +158,66 @@ func AddComment(comment *Comment) (int64, error) {
 		return 0, err
 	}
 	return comment.Id, nil
+}
+
+func DeletePost(id int64) (bool, error) {
+	res, err := db.Exec("DELETE FROM post WHERE \"id\"=$1", id)
+	if err != nil {
+		return false, err
+	}
+	count, err := res.RowsAffected()
+	if err != nil {
+		return false, err
+	}
+	if count == 0 {
+		return false, nil
+	}
+	return true, nil
+}
+
+func DeleteComment(id int64) (bool, error) {
+	res, err := db.Exec("DELETE FROM \"comment\" WHERE \"id\"=$1", id)
+	if err != nil {
+		return false, err
+	}
+	count, err := res.RowsAffected()
+	if err != nil {
+		return false, err
+	}
+	if count == 0 {
+		return false, nil
+	}
+	return true, nil
+}
+
+func UpdatePost(post Post) (bool, error) {
+	res, err := db.Exec("UPDATE post SET title=$1, content=$2 WHERE \"id\"=$3", post.Title, post.Content, post.Id)
+	if err != nil {
+		return false, err
+	}
+	count, err := res.RowsAffected()
+	if err != nil {
+		return false, err
+	}
+	if count == 0 {
+		return false, nil
+	}
+	return true, nil
+}
+
+func UpdateComment(comment Comment) (bool, error) {
+	res, err := db.Exec("UPDATE \"comment\" SET content=$1 WHERE \"id\"=$2", comment.Content, comment.Id)
+	if err != nil {
+		return false, err
+	}
+	count, err := res.RowsAffected()
+	if err != nil {
+		return false, err
+	}
+	if count == 0 {
+		return false, nil
+	}
+	return true, nil
 }
 
 // TODO: Remove repetition, currently not used

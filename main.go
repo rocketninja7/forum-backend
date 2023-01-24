@@ -63,6 +63,7 @@ func main() {
 	router.Use(cors.New(cors.Config{
 		AllowOrigins: []string{"http://localhost:3000"},
 		AllowHeaders: []string{"Content-type"},
+		AllowMethods: []string{"DELETE", "PUT"},
 	}))
 	
 	router.GET("/", GetAllPostsRest)
@@ -72,6 +73,10 @@ func main() {
 	// router.GET("/tag/:id/")
 	router.POST("/newpost/", PostNewPostRest)
 	router.POST("/newcomment/", PostNewCommentRest)
+	router.DELETE("/post/:id/", DeletePostByIdRest)
+	router.DELETE("/comment/:id/", DeleteCommentByIdRest)
+	router.PUT("post/:id/", PutPostByIdRest)
+	router.PUT("comment/:id/", PutCommentByIdRest)
 
 	router.Run("localhost:8080")
 }
