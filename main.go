@@ -78,7 +78,7 @@ func main() {
 	router.PUT("post/:id/", PutPostByIdRest)
 	router.PUT("comment/:id/", PutCommentByIdRest)
 
-	router.Run("localhost:8080")
+	router.Run("0.0.0.0:8080")
 }
 
 
