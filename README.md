@@ -15,3 +15,6 @@ To be used with https://github.com/rocketninja7/forum-frontend.
 ### PUT
 - "/post/:id/": Update a post with the specified id.
 - "/comment/:id/": Update a comment with the specified id.
+
+## Done by:
+Andrew Yapp Wei Rong (A0192320R).
