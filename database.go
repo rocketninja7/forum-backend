@@ -7,7 +7,7 @@ import (
 )
 
 func GetAllPostsWithUser() ([]Post, error) {
-	var posts []Post
+	posts := make([]Post, 0)
 
 	rows, err := db.Query(
 		"SELECT post.\"id\", post.poster, post.time_created, post.title, post.\"content\", \"user\".username " + 
@@ -222,7 +222,7 @@ func UpdateComment(comment Comment) (bool, error) {
 
 // TODO: Remove repetition, currently not used
 func GetPostsByTagID(id int64) ([]Post, error) {
-	var posts []Post
+	posts := make([]Post, 0)
 
 	rows, err := db.Query(
 		"SELECT post.\"id\", post.poster, post.time_created, post.title, post.\"content\", \"user\".username " + 
