@@ -42,7 +42,7 @@ type Tag struct {
 var db *sql.DB
 
 func main() {
-	connStr := "dbname=forum user=postgres password=1234 sslmode=disable"
+	connStr := "postgres://forum_aqee_user:6sA1MzL72Sba8yUnQynyEI2jdTL0rKOG@dpg-cf7osrirrk0e2aqmhvk0-a/forum_aqee"
 	var err error
 	db, err = sql.Open("postgres", connStr)
 
@@ -61,7 +61,7 @@ func main() {
 	router := gin.Default()
 
 	router.Use(cors.New(cors.Config{
-		AllowOrigins: []string{"http://localhost:3000"},
+		AllowOrigins: []string{"*"},
 		AllowHeaders: []string{"Content-type"},
 		AllowMethods: []string{"DELETE", "PUT"},
 	}))
